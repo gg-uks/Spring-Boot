@@ -1,0 +1,77 @@
+package com.example.jpa.service;
+
+import com.example.jpa.entity.Book;
+import com.example.jpa.entity.Cart;
+import com.example.jpa.entity.Customer;
+import com.example.jpa.repository.BookRepository;
+import com.example.jpa.repository.CartRepository;
+import com.example.jpa.repository.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CartService {
+
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
+
+    public List<Cart> getCartItemsByCustomerId(Long customerId) {
+        // Retrieve cart items by customer ID from the repository
+        return cartRepository.findByCustomer_id(customerId);
+    }
+
+    public double getTotalAmount(List<Cart> cartItems) {
+        double totalAmount = 0.0;
+        for (Cart cartItem : cartItems) {
+            // Calculate the total price for each item and add it to the total amount
+            totalAmount += cartItem.getBook().getPrice() * cartItem.getQuantity();
+        }
+        return totalAmount;
+    }
+
+    public void addToCart(Long bookId, Long customerId) {
+        // Retrieve the Book and Customer objects based on their IDs
+        Book book = bookRepository.findById(bookId) //해당아이디값에대한 책이 있나?
+                .orElseThrow(() -> new RuntimeException("Book not found")); // Handle if book is not found
+        Customer customer = customerRepository.findById(customerId)//해당아이디값에대한 고객이 있나?
+                .orElseThrow(() -> new RuntimeException("Customer not found")); // Handle if customer is not found
+
+        Cart dbCart = cartRepository.findByCustomerAndBook(bookId, customerId);
+        if (dbCart != null) {
+            System.out.println(dbCart.getId());
+            // 업데이트....
+            dbCart.setQuantity(dbCart.getQuantity() + 1);
+            cartRepository.save(dbCart); // update
+        } else {
+            // 담기
+            Cart cart = new Cart();
+            cart.setBook(book); // Set the Book object 그래야 외래키때문에 해당되는데이터(book 에있는 필드는 Book class에 세팅) cart에는 Book PK저장
+            cart.setCustomer(customer); // Set the Customer object 그래야 외래키때문에 해당되는데이터 (customer 에있는 필드는 customer class에 세팅) cart에는 customer PK저장
+            cart.setQuantity(1); // Assuming the default quantity is 1
+            cart.setCartDate(new Date()); // Set the current date
+            cartRepository.save(cart); // insert
+        }
+    }
+
+    public Optional<Cart> findById(Long id) {
+        return cartRepository.findById(id);
+    }
+
+    public void cartDelete(Cart cart) {
+        cartRepository.delete(cart); // id
+    }
+
+    public void suUpdate(Cart cart) {
+        cartRepository.save(cart); //
+    }
+}
