@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+# JDBC
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/restful
+    username: root
+    password: 1234
+# JPA  -> Hibernate 엔진->SQL 생성(테이블생성:DDL,DML):VO(Entity)-->ORM 오브젝트 릴레이셔널 매핑--> table
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect  #MySQL로 만들어줘라는 뜻
+    properties:
+      hibernate:
+        format_sql: true   #보기좋게 보여달라는것이다
+    hibernate:
+      ddl-auto: create # DTO(Object)---ORM---TABLE(Entity, R)  테이블을 만들어줘라 업데이트해줘라 처음에는 create 그다음부터는update로 바꿔야 지우고 안만듬
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl  #DTO가 테이블로 만들어질때 필드명이 컬럼으로 만들어진다 그게 스네이크 기법으로 말고 그냥 필드명으로 생성을 해준다 컬럼이름을
+    show-sql : true   #SQL을 보여달라는것
+
+upload:
+  path: src/main/resources/static/upload/
