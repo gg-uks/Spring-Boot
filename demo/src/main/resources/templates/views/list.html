@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<!--이렇게 html 뒤 쪽에 네임스페이스를 걸어야 타임리프에 제공되는 태그를 쓸수있다 -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>과일이름</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="data : ${list}">    <!--객체 바인딩된 ${list} 값을 data에 전달해준다 반복문이다 -->
+                <th th:text="${data}">과일이름</th>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
