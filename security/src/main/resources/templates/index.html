@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+    xmlns:sec="http://www.thymeleaf.org/extras/spring-security"><!--태그라이브러리 추가 해야 sec라는 키워드를 붙힐수있다-->
 <head>
     <title>Bootstrap Example</title>
     <meta charset="utf-8">
@@ -16,15 +17,20 @@
     <div class="card">
         <div class="card-header d-flex justify-content-center align-items-center">
 
-            <!-- 로그인이 실패 하거나 로그인이 안된상태 -->
-            <form class="form-inline" th:action="@{/loginProcess}" method="post">
+            <div th:if="${error}" class="form-group mr-2">
+                <p style="color:red;">Login failed,Please try again.</p>
+            </div>
+            <div th:if="${logout}" class="form-group mr-2">
+                <p style="color:red;">You have been logged out successfully.</p>
+            </div>
 
-                <div th:if="${error}" class="form-group mr-2">
-                    <p style="color:red;">Login failed,Please try again.</p>
-                </div>
-                <div th:if="${logout}" class="form-group mr-2">
-                    <p style="color:red;">You have been logged out successfully.</p>
-                </div>
+            <!-- 로그인이 실패 하거나 로그인이 안된상태 --> <!--SPEL -->
+            <!--#authentication.expression('isAuthenticated()')**는 Spring Security와 통합되어 인증된 사용자인지 확인하는 함수야. 즉, isAuthenticated() 메서드는 현재 사용자가 인증된 상태인지 확인            -->
+            <form class="form-inline" th:action="@{/loginProcess}" method="post"
+                  th:if="${not #authorization.expression('isAuthenticated()')}"
+            >
+
+
 
                 <div class="form-group mr-2">
                     <label for="username">Username:</label>
@@ -36,10 +42,29 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm">Login</button>
             </form>
-            <!-- 로그인이 성공하면
-            <form th:action="@{/logout}" method="post">
+            <!-- 로그인이 성공하면-->  <!--SPEL -->
+            <form th:action="@{/logout}" method="post" class="form-inline"
+                  th:if="${#authorization.expression('isAuthenticated()')}">    <!-- #authorization 은 권한 확인 용도 로씀 isAuthenticated()은 로그인한 사용자를 확인-->
+                <p>로그인 사용자:<span th:text="${#authentication.principal.customer.customerName}"></span></p>
                 <button type="submit">Logout</button>
-            </form>-->
+                <ul>
+                    <li th:each="role : ${#authentication.authorities}" th:text="${role.authority}"></li>
+                </ul>
+            </form>
+            <!--SPEL -->                                               <!--hasAuthority 로 도 쓸수있음 쓸때는 ROLE접두사를 붙혀줘야 한다 -->
+            <div class="mx-2" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                <a th:href="@{/admin/list}" class="btn btn-sm btn-secondary">관리자</a>
+            </div>
+            <!--SPEL -->                                                  <!--hasAuthority 로 도 쓸수있음 쓸때는 ROLE접두사를 붙혀줘야 한다 -->
+            <div class="mx-2" th:if="${#authorization.expression('hasAnyRole(''ADMIN'',''USER'')')}">
+                <a th:href="@{/admin/list}" class="btn btn-sm btn-secondary">일반유저 / 관리자</a>
+            </div>
+
+            <!--SPEL -->                                                  <!--hasAuthority 로 도 쓸수있음 쓸때는 ROLE접두사를 붙혀줘야 한다 -->
+            <div sec:authorize="hasAuthority('ROLE_ADMIN')" class="mx-2" >
+                <a th:href="@{/admin/list}" class="btn btn-sm btn-secondary">매장관리</a>
+            </div>
+
             <div class="mx-2">
                 <a th:href="@{/member/memberRegister}" class="btn btn-sm btn-secondary">회원가입</a>
             </div>

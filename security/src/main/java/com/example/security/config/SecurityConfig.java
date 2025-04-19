@@ -32,6 +32,7 @@ public class SecurityConfig {
         )
                 .formLogin(form->form //> form > 로그인폼으로 전환시킬수 있는 클래스
                         .loginPage("/") //login 페이지 URL -> /login -> Controller -> View(customLogin.html)  //리다이렉션됨
+                        // UsernamePasswordAuthenticationFilter : /loginProcess 라는 요청이오면 이 필터가 가로챈다 --> UserDetailsService(interface) 스프링이 만들어논 이클래스를 실행하게 되어있다 이쪽으로 제어권이 넘어간다 그래서 인터페이스를 implement를 해주는 클래스를 만들어 줘야 한다
                         .loginProcessingUrl("/loginProcess")// (URL 가로채서 :username ,password 정보를 읽어 DB연동함 ) 이URL로 넘어오면 스프링 시큐리티 로 제어권이 넘어간다 즉 제어권을 넘긴다 Spring Security API에서 처리
                         .defaultSuccessUrl("/") //로그인이 성공하면 이쪽 경로로 리다이렉션
                         .failureUrl("/?error=true") //로그인이 실패했을때 경로로 리다이렉션 -> error=true는 로그인 실패했을때 다시시도하라는 문구를 나타내기위한 작업이다

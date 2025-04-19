@@ -13,7 +13,7 @@ import java.util.Set;
 @Service
 public class MemberService {
     @Autowired
-    private MemberRepository memberRepository;
+    private MemberRepository memberRepository; //디비처리하기위한 주입
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder; //시큐리티 컨피그 파일에 BCryptPasswordEncoder 클래스 를 주입받아 암호화 할때 사용한다
@@ -33,4 +33,6 @@ public class MemberService {
         customer.setRoles(roles);//다시 고객 정보에 권한을 저장해준다 해주면 요거는 중간다리 테이블 역할하기 때문에 자동으로 회원가입시 조인테이블이 형성되서 정보가 들어간다
         return memberRepository.save(customer); //insert쿼리
     }
+
+
 }

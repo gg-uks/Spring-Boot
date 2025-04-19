@@ -62,13 +62,14 @@ public class Customer {  //고객(object) -> ORM -> TABLE : Review(리뷰)
     //JPA는 기본적으로 다대다(M:N) 관계를 "복합 기본키가 있는 조인 테이블"로 처리한다는 뜻  만약 중간테이블에서 컬럼을 추가하고 싶으면 OneToMany ManyToOne로 설정해야함
     //@JoinTable은 관계의 양쪽 중 한쪽에서만 설정해야 하며, mappedBy는 반대쪽에서 설정해야 함
     //결론적으로, 중간 테이블 설정은 다대다 관계의 어느 클래스에서 설정하든 상관없다. 다만, 관계의 주인이 되어야 하는 클래스에서 설정을 해야 하고, 다른 클래스에서는 이를 참조하는 방식으로 관계를 정의해야 함
-    @ManyToMany//M:N(다:다) 별도의 비지니스 테이블이 필요함
+    @ManyToMany(fetch = FetchType.LAZY)  //지연로딩    M:N(다:다) 별도의 비지니스 테이블이 필요함
     @JoinTable(
      name = "member_roles",      //고객 아이디와 롤의 아이디를 외래키로 테이블을 만들어준다 (중간테이블)
      joinColumns = @JoinColumn(name = "customer_id"),//현재 엔티티(Member)의 외래 키
      inverseJoinColumns = @JoinColumn(name = "role_id")//연결되는 엔티티(Role)의 외래 키 이름 지정
     )
-    private Set<Role> roles; //중복이 안되는 리스트
+    private Set<Role> roles; //고객의 권한 정보도 가져올건지 아니면 가지고오지 않을건지
+    //중복이 안되는 리스트
 //   컬렉션 프레임워크는 그 클래스를 참조하는 객체 필드를 만든다 그래서 조인할때도  Set<Role> roles; 여기에 저장된 것으로 조인을 해서 데이터를 가져온다
 //    즉시로딩 (EAGER)	엔티티를 조회할 때 연관된 엔티티도 함께 즉시 조인해서 한 번에 가져옴 (JOIN FETCH처럼)
 //    지연로딩 (LAZY)	엔티티를 먼저 가져오고, 연관된 엔티티는 나중에 실제로 접근할 때 가져옴 (프록시 객체로 대기)
