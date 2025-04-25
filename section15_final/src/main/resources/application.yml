@@ -1,0 +1,33 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+# JDBC
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/oauth2
+    username: root
+    password: 1234
+  # JPA
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: update # DTO(Object)---ORM---TABLE(Entity, R)
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql : true
+
+#OAuth2 인증 설정은 git에 보안상 올릴 수 없으므로 본인이  영상을 보고  설정하세요^^
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 814625681686-89q8n8q0emdaeq93deujkrvmf5r5go24.apps.googleusercontent.com
+            client-secret: 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
+            scope: email,profile
