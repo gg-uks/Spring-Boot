@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Customer customer = objectMapper.readValue(request.getInputStream(), Customer.class);//요청으로 들어오는 걸 인풋스트림으로 읽어서 Customer클래스로 바꿔준다 자동으로 JSON이 Customer이랑 매핑이 된다 -> InputStream은 "데이터 읽기"만 하고, ObjectMapper가 "JSON → Java 객체 매핑"을 한다. ->변환된 Customer 객체를 담아서, 이후 코드에서 아이디/비밀번호 같은 데이터 꺼내 쓸 수 있다.
             System.out.println(customer); //Customer(id=null, username=guk, password=1234, roles=null)
             //username과 password ->
-            UsernamePasswordAuthenticationToken authenticationToken= // 스프링 시큐리티가 내부적으로 필터에서 인증하려면 기본적으로 username password가 UsernamePasswordAuthenticationToken 이타입으로 만들어져야 한다
+            UsernamePasswordAuthenticationToken authenticationToken= // 스프링 시큐리티가 내부적으로 필터에서 인증하려면 기본적으로 username,password 가 UsernamePasswordAuthenticationToken 이타입으로 만들어져야 한다
                     new UsernamePasswordAuthenticationToken(customer.getUsername(),customer.getPassword());
             // authenticate == PrincipalDetailsService implements UserDetailsService loadUserByUsername() 을 실행한다
         Authentication authentication =authenticationManager.authenticate(authenticationToken);// loadUserByUsername() 이 실행되 인증이 성공적으로 마치면 Authentication 객체가 만들어진다
@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             System.out.println(customerUser.getUsername());
 
             return authentication; //세션에 등록하기 위하여 ->SecurityContextHolder 에 저장  -> 권한 처리
-            //데이터 베이스 인정처리 --- JWT토큰 발행
+            //데이터 베이스 인증처리 --- JWT토큰 발행
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -82,3 +82,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     }
 }
+
+
+//요약
+//서버 -> 클라이언트 응답: 서버는 JWT 토큰을 생성하고, SECRET 키로 서명한 후 클라이언트에 전달. 근데 클라이언트로 응답할때는 시크릿 키를 제외하고 암호화함
+//
+//클라이언트 -> 서버 요청: 클라이언트는 이 JWT 토큰을 Authorization 헤더에 포함하여 요청을 보냅니다.
+//
+//서버 검증: 서버는 클라이언트가 보낸 JWT 토큰을 SECRET 키로 서명 검증을 하고, 유효한 토큰일 경우 해당 요청을 처리. 내부적으로 자동으로 시크릿 키를 포함시켜 유효한지 판단함
+//
+//이 과정에서 중요한 점은 SECRET 키가 서버만 알고 있어야 하며, 이를 통해 토큰의 위변조를 방지하고 정당성을 확인할 수 있다
