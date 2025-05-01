@@ -58,6 +58,8 @@ public class SecurityConfig {
                        // 추가적인 필터 2개를 등록....
                         .addFilter(new JwtAuthenticationFilter(authenticationManager)) // AuthenticationManager
                         .addFilter(new JwtAuthorizationFilter(authenticationManager,customerService));
+                //JwtAuthenticationFilter는 1회,
+                //JwtAuthorizationFilter는 모든 요청마다 동작합니다 (시큐리티 인증이 필요한 URL에 대해).
         }
     }
 }

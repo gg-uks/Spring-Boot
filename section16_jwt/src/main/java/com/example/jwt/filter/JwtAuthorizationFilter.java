@@ -40,13 +40,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {//JwtAuth
             return;
         }
         //정상적인 JWT 토큰이면..
-        String jwtToken = request.getHeader("Authorization").replace("Bearer","");//replace("Bearer","") JWT 토큰정보를 Bearer를 빈값으로 바꿔서 실제 토큰값을 가지고온다
+        String jwtToken = request.getHeader("Authorization").replace("Bearer ","");//replace("Bearer ","") JWT 토큰정보를 Bearer[공백] 를 빈값으로 바꿔서 실제 토큰값을 가지고온다
         //cosin
-        // 2. JWT 라이브러리를 사용해서 토큰을 검증하고,
+        // 2. JWT 라이브러리를 사용해서 토큰을 검증하고,  -> JWT 토큰을 디코딩,
 //    정상적이면 토큰 안에 들어 있는 "username" 이라는 claim 값을 꺼낸다
         String username = JWT.require(Algorithm.HMAC256(JwtProperties.SECRET))// (1) 시크릿 키를 이용해서 (HMAC256 알고리즘을 씀) -> 서버에서 미리 정해둔 비밀키(SECRET) 로 JWT를 검증할 준비를 하는 것
                 .build()// (2) JWT 검증 객체를 만들고
-                .verify(jwtToken) // (3) 받은 jwtToken을 검증한다
+                .verify(jwtToken) // (3) 받은 jwtToken을 검증한다 verify을 호출하면 서명 검증을 진행하고, 만약 서명이 유효하다면, 클레임을 추출할 수있음
                 .getClaim("username") // (4) 토큰 안에 들어있는 "username" 클레임을 가져온다
                 .asString(); // (5) 그 값을 문자열로 변환한다
         if(username!=null){
@@ -55,6 +55,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {//JwtAuth
             Authentication authentication = new UsernamePasswordAuthenticationToken(customerUser,null,customerUser.getAuthorities()); //권한정보와 사용자 정보를 만듬 //로그인 완료를 의미하는 Authentication 객체를 직접 만든다.첫 번째 인자: 사용자 정보, 두 번째 인자: 비밀번호 (우리는 JWT니까 필요없어서 null), 세 번째 인자: 권한 정보(roles)
             SecurityContextHolder.getContext().setAuthentication(authentication); //스프링 시큐리티 컨텍스트 홀더에 저장 하는것이다  //현재 스레드(SecurityContext)에 인증 객체를 집어넣는다. → 즉, "이 요청은 인증된 사용자야" 라고 등록하는 것!
         }
+        chain.doFilter(request,response);
     }
 }
 
